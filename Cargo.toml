@@ -1,0 +1,7 @@
+[package]
+name = "ff_solver"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+permanganate = "0.2.0"
