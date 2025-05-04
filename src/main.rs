@@ -1,15 +1,15 @@
+use std::collections::HashMap;
+use std::env;
 use std::fs::{self,File};
 use std::io::{self, BufRead};
 use std::num::NonZero;
 use std::path::Path;
-use std::env;
 use std::process;
 
 use crate::permanganate::builder::SquareBoardBuilder;
 pub use permanganate;
-use permanganate::Builder;
-use permanganate::Location;
-use std::collections::HashMap;
+use permanganate::{Builder, Location};
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 struct Position {
     row: usize,
@@ -43,13 +43,13 @@ fn main() -> io::Result<()> {
 
     for line_result in reader.lines() {
         let line: String = line_result?;
-        for (col_index, char) in line.chars().enumerate() {
-            if char != '.' {
+        for (col_index, ch) in line.chars().enumerate() {
+            if ch != '.' {
                 let position: Position = Position {
                     row: row_index,
                     col: col_index,
                 };
-                letter_locations.entry(char).or_insert(Vec::new()).push(position);
+                letter_locations.entry(ch).or_insert(Vec::new()).push(position);
             }
         }
         row_index += 1;
