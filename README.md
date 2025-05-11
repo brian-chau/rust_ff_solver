@@ -4,4 +4,4 @@ Using the `permanganate` crate, this Rust app reads in a grid that represents a 
 
 ## Usage
 
-> cargo run grid.txt > out.txt
+> cargo run

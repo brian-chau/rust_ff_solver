@@ -1,11 +1,9 @@
 use std::collections::HashMap;
 use std::env;
-use std::fs::{self,File};
-use std::io::{self, BufRead};
+use std::fs::{self, File};
+use std::io::{self, Write, BufRead};
 use std::num::NonZero;
 use std::path::Path;
-use std::process;
-
 use crate::permanganate::builder::SquareBoardBuilder;
 pub use permanganate;
 use permanganate::{Builder, Location};
@@ -28,11 +26,12 @@ fn get_line_count(filename: &str) -> usize {
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        process::exit(1);
+    let new_args: &str = "grid.txt";
+    let mut filename: String = new_args.trim().into();
+    if args.len() == 2 {
+        filename = args[1].clone();
     }
 
-    let filename: String = args[1].clone();
     let path: &Path = Path::new(&filename); // Replace with the actual path to your file
     let line_count: usize = get_line_count(&filename);
     let file: File = File::open(path)?;
@@ -49,7 +48,10 @@ fn main() -> io::Result<()> {
                     row: row_index,
                     col: col_index,
                 };
-                letter_locations.entry(ch).or_insert(Vec::new()).push(position);
+                letter_locations
+                    .entry(ch)
+                    .or_insert(Vec::new())
+                    .push(position);
             }
         }
         row_index += 1;
@@ -71,18 +73,27 @@ fn main() -> io::Result<()> {
         }
     }
 
-    let mut board: SquareBoardBuilder =
-        SquareBoardBuilder::with_dims((NonZero::new(line_count).unwrap(), NonZero::new(line_count).unwrap()));
+    let mut board: SquareBoardBuilder = SquareBoardBuilder::with_dims((
+        NonZero::new(line_count).unwrap(),
+        NonZero::new(line_count).unwrap(),
+    ));
     for data in letter_pairs {
         board.add_termini(
             data.letter,
-            (Location(data.positions[0].col, data.positions[0].row), Location(data.positions[1].col, data.positions[1].row)),
+            (
+                Location(data.positions[0].col, data.positions[0].row),
+                Location(data.positions[1].col, data.positions[1].row),
+            ),
         );
     }
 
     let solved: permanganate::Board<permanganate::shape::SquareStep> = board.build().unwrap();
     if let Ok(res) = solved.solve() {
         println!("{}", res);
+        let mut file: File = File::create("out.txt")?;
+
+        // Write to the file
+        writeln!(file, "{}", res)?;
     } else {
         println!("err");
     }
